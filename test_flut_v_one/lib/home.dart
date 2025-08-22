@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -11,10 +11,38 @@ class _MyHomePageState extends State<MyHomePage> {
   
 int count = 0;
 
-
-  void _updateTtextt(){
+  @override
+  void initState(){
+    super.initState();
+    _loadCounter();
+  }
+  Future<void> _loadCounter() async {
+    final prefs = await  SharedPreferences.getInstance();
     setState(() {
-      count++;
+      count = prefs.getInt('count') ?? 0;
+    });
+  }
+
+  Future<void> _updateTtextt() async{
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      count  = (prefs.getInt('count') ?? 0 ) + 1;
+      prefs.setInt('count', count);
+    });
+  }
+  Future<void> _unUpdateText() async{
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      count  = (prefs.getInt('count') ?? 0 ) - 1;
+      prefs.setInt('count', count);
+    });
+  }
+  Future<void> _resetText()  async{
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      count  = 0;
+      prefs.setInt('count', count);
     });
   }
 
@@ -47,7 +75,12 @@ int count = 0;
             ),
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _updateTtextt,
-            child: const Text('press'))
+            child: const Text('increase')),
+            ElevatedButton(onPressed: _unUpdateText, 
+            child: const Text('decrease')),
+            ElevatedButton(onPressed: _resetText,
+            child: const Text('resert'))
+
 
           ],
         )
